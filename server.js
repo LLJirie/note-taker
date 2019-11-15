@@ -2,6 +2,7 @@ const fs = require("fs");
 const util = require("util");
 
 const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
 var express = require("express");
 
@@ -20,18 +21,46 @@ app.get("/", function (req, res) {
 
 // routes
 app.get("/api/notes", async function (req, res) {
+    try {
     const notes = await readFile("./db/db.json", "utf8");
     res.json(JSON.parse(notes));
+}catch(err){
+    console.log(err);
+}
 });
 
+app.post("/api/notes", async function (req, res) {
+    let allNotes;
+    const {title, text} = req.body;
+    
+    const newNote = {title, text}
 
-app.post("/api/notes", function (req, res) {
-    res.json("");
-})
+    const currentNotes = await readFile("./db/db.json", "utf8");
+    console.log("currentNotes", JSON.parse(currentNotes));
+
+    allNotes = [].concat(JSON.parse(currentNotes));
+    allNotes.push(newNote);
+    console.log("allNotes: ", allNotes);
+
+    try {
+    const notes = await writeFile("./db/db.json", JSON.stringify(allNotes));
+    res.json(allNotes);
+}catch(err){
+    console.log(err);
+}
+
+});
+
+// app.post("/api/notes", function (req, res) {
+//     res.json("");
+// })
 
 app.delete("/api/notes/:id", function (req, res) {
     const id = req.params.id;
 })
+
+
+    
 
 app.get("*", function (req, res) {
     res.redirect("/");
