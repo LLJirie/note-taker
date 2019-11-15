@@ -1,5 +1,6 @@
 const fs = require("fs");
 const util = require("util");
+const uuid = require('uuid/v4');
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -32,8 +33,8 @@ app.get("/api/notes", async function (req, res) {
 app.post("/api/notes", async function (req, res) {
     let allNotes;
     const {title, text} = req.body;
-    
-    const newNote = {title, text}
+    const id = uuid();
+    const newNote = {title, text, id}
 
     const currentNotes = await readFile("./db/db.json", "utf8");
     console.log("currentNotes", JSON.parse(currentNotes));
@@ -56,7 +57,11 @@ app.post("/api/notes", async function (req, res) {
 // })
 
 app.delete("/api/notes/:id", function (req, res) {
+    console.log("delete route hit")
     const id = req.params.id;
+    console.log(id);
+    
+
 })
 
 
